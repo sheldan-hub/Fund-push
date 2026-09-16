@@ -1,0 +1,31 @@
+name: 基金回撤微信推送
+
+on:
+  schedule:
+    # GitHub Actions 的 cron 使用 UTC 时间。
+    # 基金净值一般收盘后 ~20:00 公布；北京时间 21:00 = UTC 13:00；1-5 为工作日。
+    - cron: '0 13 * * 1-5'
+  workflow_dispatch: {}   # 允许在 Actions 页面手动点 “Run workflow” 测试
+
+jobs:
+  push:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: 拉取代码
+        uses: actions/checkout@v4
+
+      - name: 配置 Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: 安装依赖
+        run: pip install requests
+
+      - name: 抓取净值并计算回撤、推送到微信
+        env:
+          SENDKEY: ${{ secrets.SENDKEY }}        # 密钥：Server 酱 SendKey
+          FUND_CODE: ${{ vars.FUND_CODE }}       # 变量：基金代码，如 161725
+          FUND_NAME: ${{ vars.FUND_NAME }}       # 变量：显示名（可空）
+        run: python fund_push.py
