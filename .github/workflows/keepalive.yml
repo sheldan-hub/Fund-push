@@ -1,0 +1,27 @@
+name: Keepalive
+
+on:
+  schedule:
+    # 每周日 UTC 0 点运行（远小于 60 天窗口，足够安全）
+    - cron: '0 0 * * 0'
+  workflow_dispatch:   # 允许手动触发，方便首次测试能否跑通
+
+# 必须授予写入权限，否则下面的 git push 会失败
+permissions:
+  contents: write
+
+jobs:
+  keepalive:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Heartbeat commit
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          # 更新时间戳文件，确保每次都有实质改动（也可改用 --allow-empty）
+          date -u > .keepalive
+          git add .keepalive
+          git commit -m "chore: keepalive [skip ci]" || echo "nothing to commit"
+          git push
