@@ -4,7 +4,7 @@ on:
   schedule:
     # GitHub Actions 的 cron 使用 UTC 时间。
     # 基金净值一般收盘后 ~20:00 公布；北京时间 21:00 = UTC 13:00；1-5 为工作日。
-    - cron: '0 13 * * 1-5'
+    - cron: '0 15 * * 1-5'
   workflow_dispatch: {}   # 允许在 Actions 页面手动点 “Run workflow” 测试
 
 jobs:
